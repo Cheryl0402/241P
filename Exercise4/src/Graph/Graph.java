@@ -6,29 +6,77 @@ import java.util.List;
 
 public class Graph {
     int v; //number of vertices
-    List<Node> G;
+    private Map<String, ArrayList<String>> adList;
 
-    Graph(int v){
-        this.v = v;
-        G = new ArrayList<Node>();
-        for(int i = 0; i < v; i++){
-            G.add(new Node(i));
+    public Graph(){
+        this.v = 0;
+        this.adList = new HashMap<String, ArrayList<String>>();
+    }
+
+    public Graph(int vertices){
+        this.v = vertices;
+        adList = new HashMap<String, ArrayList<String>>();
+        for(int i = 0; i < vertices; i++){
+            ArrayList<String> neighbours = new ArrayList<>();
+            adList.put("", neighbours);
         }
     }
 
-    public void addEdge(int u, int v){
-
+    public void addEdge(String v, String neighbour){
+//        // check if the vertex is out of bound
+        if(!adList.containsKey(v)){
+            ArrayList<String> list = new ArrayList<>();
+            list.add(neighbour);
+            adList.put(v, list);
+        }
+        if(!adList.containsKey(neighbour)){
+            ArrayList<String> list = new ArrayList<>();
+            list.add(v);
+            adList.put(neighbour, list);
+        }
+        // For undirected graph, add each node as neighbour.
+        adList.get(v).add(neighbour);
+        adList.get(neighbour).add(v);
     }
 
-    public void bfs(int vertex, )
+    public ArrayList<String> getNeighbours(String vertex){
+        //check if vertex is a part of graph.
+        if(adList.containsKey(vertex)){
+            return null;
+        }
+        return new ArrayList<String>(adList.get(vertex));
+    }
 
-}
+    public void bfs(String vertex){
+        Set<String> visited = new HashSet<>();
+        Queue<String> queue = new LinkedList<>();
+        queue.add(vertex);
+        visited.add(vertex);
 
-class Node{
-    int val;
-    List<Integer> list = new ArrayList<Integer>();
+        while(!queue.isEmpty()){
+            String v = queue.poll();
+            System.out.print(v + ", ");
+            List<String> neighbours = this.getNeighbours(v);
+            Collections.sort(neighbours);
+            for(String neighbour : neighbours){
+                if(!visited.contains(neighbour)){
+                    queue.add(neighbour);
+                    visited.add(neighbour);
+                }
+            }
+        }
+    }
 
-    Node(int val){
-        this.val = val;
+    public void dfs(String vertex, Set<String> visited){
+        if(visited.contains((vertex))) return;
+        visited.add(vertex);
+        System.out.print(vertex + ", ");
+        List<String> neighbours = this.getNeighbours(vertex);
+        Collections.sort(neighbours);
+        for(String neighbour :  neighbours){
+            dfs(neighbour, visited);
+        }
     }
 }
+
+
